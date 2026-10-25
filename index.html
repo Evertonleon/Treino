@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Treino">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Treino da academia</title>
+<style>
+:root{
+  --round: ui-rounded,"SF Pro Rounded",-apple-system,system-ui,"Segoe UI",sans-serif;
+  --text: -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",sans-serif;
+  --bg:#F2F2F7; --surface:#FFFFFF; --ink:#1C1C1E; --muted:#8A8A8E; --line:#E5E5EA; --chip:#F2F2F7;
+  --c0:#2C2C2E; --c1:#3A3A3C; --c2:#48484A; --c3:#5A5A5E; --done:#1C1C1E;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --surface:#1C1C1E; --ink:#F2F2F7; --muted:#8E8E93; --line:#2C2C2E; --chip:#2C2C2E;
+    --c0:#3A3A3C; --c1:#48484A; --c2:#545458; --c3:#636366; --done:#F2F2F7;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#1C1C1E; --ink:#F2F2F7; --muted:#8E8E93; --line:#2C2C2E; --chip:#2C2C2E;
+  --c0:#3A3A3C; --c1:#48484A; --c2:#545458; --c3:#636366; --done:#F2F2F7;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--text);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+.wrap{max-width:520px;margin:0 auto;padding:18px 16px 48px}
+h1,h2,h3,.disp{font-family:var(--round);font-weight:700;letter-spacing:-.01em;margin:0;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-user-select:none;user-select:none}
+button:active{transform:scale(.97)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--c0);outline-offset:2px}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.c0{--c:var(--c0)} .c1{--c:var(--c1)} .c2{--c:var(--c2)} .c3{--c:var(--c3)}
+
+/* cartão do dia */
+.plate{border-radius:26px;color:#fff;padding:22px 22px 24px;position:relative;overflow:hidden;
+  background:radial-gradient(130% 110% at 100% 0%,rgba(255,255,255,.30),rgba(255,255,255,0) 55%),var(--c);
+  box-shadow:0 10px 24px -16px rgba(0,0,0,.35)}
+.plate::after{content:"";position:absolute;right:-46px;bottom:-46px;width:150px;height:150px;border-radius:50%;
+  border:18px solid rgba(255,255,255,.16);box-shadow:inset 0 0 0 20px rgba(255,255,255,.08)}
+.plate .k{font-size:.9rem;font-weight:600;opacity:.85}
+.plate h1{font-size:2.3rem;margin:2px 0 6px}
+.plate p{margin:0;max-width:24ch;opacity:.92;font-size:.98rem}
+
+.primary{display:block;width:100%;border:0;border-radius:16px;background:var(--c,var(--ink));color:#fff;
+  font-family:var(--round);font-weight:700;font-size:1.15rem;padding:16px;margin-top:16px;
+  transition:transform .1s}
+.primary:disabled{opacity:.4}
+.ghost{border:0;background:var(--chip);border-radius:999px;padding:7px 14px;font-weight:600;color:var(--ink)}
+
+.list{margin:16px 0 0;padding:2px 16px;list-style:none;background:var(--surface);border-radius:18px}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);font-size:.98rem}
+.list li:last-child{border-bottom:0}
+.sr{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:.8rem;font-weight:600;color:var(--muted);background:var(--chip);border-radius:8px;padding:3px 8px}
+
+.section{margin-top:28px}
+.section h2{font-size:1.25rem;margin:0 4px 10px}
+.days{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.days button{border:2px solid transparent;background:var(--surface);border-radius:16px;padding:12px 2px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;transition:transform .1s}
+.days button .dot{width:16px;height:16px;border-radius:50%;background:var(--c)}
+.days button span{font-weight:600;font-size:.85rem}
+.days button[aria-pressed="true"]{border-color:var(--ink)}
+.note{margin:10px 4px 0}
+.hist{margin:0;padding:2px 16px;list-style:none;background:var(--surface);border-radius:18px}
+.hist li{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.hist li:last-child{border-bottom:0}
+.hist .dot{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+
+/* sessão */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.top h2{font-size:1.35rem}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:var(--c);border-radius:3px;transition:width .3s}
+.card{background:var(--surface);border-radius:24px;padding:20px}
+.tag{display:inline-block;font-size:.78rem;font-weight:700;color:var(--muted);background:color-mix(in srgb,var(--c) 12%,transparent);border-radius:999px;padding:4px 10px}
+.card h1{font-size:1.75rem;margin-top:10px}
+.card .target{font-size:.98rem;margin-top:6px;color:var(--muted)}
+.card .target b{color:var(--ink);font-weight:600}
+.load{display:flex;align-items:center;gap:10px;margin-top:16px}
+.load label{font-weight:600}
+.load input{width:92px;border:0;background:var(--chip);color:var(--ink);border-radius:12px;padding:10px;font:inherit;font-size:1.05rem;font-weight:600;text-align:center}
+.sets{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.set{width:60px;height:60px;border-radius:50%;border:2px solid var(--line);background:transparent;font-family:var(--round);font-weight:700;font-size:1.2rem;display:grid;place-items:center;transition:background .15s,border-color .15s,transform .1s}
+.set.on{background:var(--c);border-color:var(--c);color:#fff}
+.hint{margin:10px 0 0}
+
+.rest{margin-top:14px;background:var(--chip);border-radius:16px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.rest .t{font-family:var(--round);font-weight:700;font-size:2.2rem;font-variant-numeric:tabular-nums;line-height:1;color:var(--ink)}
+.rest.over .t{color:var(--done)}
+.rest button{background:var(--surface);border:0;color:var(--ink);border-radius:999px;padding:8px 14px;font-weight:600}
+
+.notes{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.notes h3{font-size:1rem;margin:12px 0 3px}
+.notes h3:first-child{margin-top:0}
+.notes p{margin:0;color:var(--muted);font-size:.93rem;max-width:60ch}
+
+.daylist{margin:18px 0 0;padding:2px 16px;list-style:none;background:var(--surface);border-radius:18px}
+.daylist li button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:12px 0}
+.daylist li:last-child button{border-bottom:0}
+.daylist .chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:.75rem;color:#fff}
+.daylist .chk.on{background:var(--c);border-color:var(--c)}
+.daylist .cur{font-weight:700}
+.daylist .nm{flex:1;font-size:.95rem}
+
+.finish{text-align:center;padding-top:40px}
+.finish .ring{width:110px;height:110px;border-radius:50%;margin:0 auto 20px;background:var(--c);box-shadow:inset 0 0 0 16px rgba(255,255,255,.25),0 12px 30px -14px var(--c)}
+.finish h1{font-size:2.1rem}
+.sync{margin-top:24px;text-align:center}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script>
+const DAYS = [
+  {nome:"Segunda", foco:"Peito, ombro, tríceps e panturrilha", ex:[
+    ["Supino inclinado com halteres",3,"6-10",1],
+    ["Crucifixo no cabo (alongando bem)",3,"10-15",0],
+    ["Elevação lateral no cabo",3,"12-20",0],
+    ["Tríceps francês na polia (acima da cabeça)",3,"10-15",0],
+    ["Crucifixo inverso",2,"12-15",0],
+    ["Gêmeos em pé",4,"8-12",0]]},
+  {nome:"Terça", foco:"Posteriores, costas e panturrilha", ex:[
+    ["Mesa flexora sentado",3,"8-12",0],
+    ["Stiff / RDL",3,"6-10",1],
+    ["Puxada frontal com pegada neutra",3,"8-12",1],
+    ["Remada apoiada no peito",3,"8-12",1],
+    ["Leg press",2,"8-12",1],
+    ["Gêmeos sentado (sóleo)",4,"10-15",0]]},
+  {nome:"Quinta", foco:"Peito, ombro, braços e panturrilha", ex:[
+    ["Supino reto com halteres ou máquina",3,"6-10",1],
+    ["Elevação lateral com halteres",3,"12-20",0],
+    ["Face pull",3,"12-15",0],
+    ["Tríceps na polia (corda)",3,"10-15",0],
+    ["Rosca inclinada com halteres",2,"10-15",0],
+    ["Gêmeos em pé",3,"8-12",0]]},
+  {nome:"Sexta", foco:"Posteriores, costas, glúteos, core e panturrilha", ex:[
+    ["Mesa flexora sentado ou deitado",3,"8-12",0],
+    ["Nordic (ou glute-ham raise)",2,"4-8",1],
+    ["Remada baixa no cabo",3,"8-12",1],
+    ["Hip thrust",3,"8-12",1],
+    ["Abdominal com rodinha ou prancha",2,"8-15",0],
+    ["Gêmeos sentado",4,"10-15",0]]}
+];
+const REST_BASIC = 150, REST_ISO = 75;
+const SUPINO = {how:"Amplitude completa, descendo até alongar bem o peito. Pare a 1-3 repetições da falha e descanse 2-3 min. Quando bater o topo da faixa em todas as séries, suba a carga.", why:"Treinar cada grupo 2 vezes por semana rende mais que 1 vez (Schoenfeld 2016). Parar perto da falha dá hipertrofia parecida com a falha total, com menos fadiga (Refalo 2023)."};
+const LATERAL = {how:"Suba até a linha do ombro, desça controlando. Aqui a falha total é segura. Descanso de 60-90 s.", why:"Overhead, BMU e HSPU do CrossFit já dão muito volume de deltoide anterior; por isso o programa trabalha só o lateral e o posterior."};
+const POSTERIOR_OMBRO = {how:"Cotovelos levemente flexionados, puxe abrindo os braços e sem embalo. Pode ir perto da falha. Descanso de 60-90 s.", why:"Deltoide posterior equilibra o ombro, já que o CrossFit carrega muito o deltoide anterior."};
+const GEMEOS_PE = {how:"Joelho estendido. Desça até o máximo de alongamento e segure 1-2 s embaixo, depois suba até a ponta total. Falha total é segura.", why:"O gastrocnêmio responde melhor com o joelho estendido, e a amplitude completa pesa bastante no resultado (Kassiano 2023)."};
+const GEMEOS_SENT = {how:"Joelho flexionado. Amplitude completa, segurando 1-2 s na posição alongada. Falha total é segura.", why:"Com o joelho flexionado o trabalho vai para o sóleo, que o gêmeos em pé não pega bem (Kassiano 2023)."};
+const FLEXORA = {how:"Amplitude completa, segurando 1-2 s com a perna estendida (posição alongada). Falha total é segura. Descanso de 60-90 s.", why:"A flexora sentada gerou mais hipertrofia que a deitada, por alongar mais os posteriores (Maeo 2021)."};
+const REMADA = {how:"Peito ou tronco apoiado, puxe com os cotovelos e alongue bem as costas na volta. Pare a 1-3 repetições da falha. Descanso de 2-3 min.", why:"Remadas apoiadas evitam somar carga na lombar com o stiff e o deadlift do CrossFit."};
+const NOTES = {
+  "Supino inclinado com halteres": SUPINO,
+  "Supino reto com halteres ou máquina": SUPINO,
+  "Crucifixo no cabo (alongando bem)": {how:"Abra até sentir o peito bem alongado e segure 1-2 s ali. Feche controlando. Descanso de 60-90 s.", why:"Os estudos sustentam o princípio de enfatizar a posição alongada; os crucifixos são um dos pontos onde isso mais importa."},
+  "Elevação lateral no cabo": LATERAL,
+  "Elevação lateral com halteres": LATERAL,
+  "Tríceps francês na polia (acima da cabeça)": {how:"Braços acima da cabeça, desça até alongar bem o tríceps e segure 1-2 s. Estenda sem abrir os cotovelos. Descanso de 60-90 s.", why:"A extensão acima da cabeça alonga a cabeça longa e gerou mais hipertrofia que a extensão com o braço ao lado do corpo (Maeo 2023)."},
+  "Crucifixo inverso": POSTERIOR_OMBRO,
+  "Face pull": POSTERIOR_OMBRO,
+  "Gêmeos em pé": GEMEOS_PE,
+  "Gêmeos sentado (sóleo)": GEMEOS_SENT,
+  "Gêmeos sentado": GEMEOS_SENT,
+  "Mesa flexora sentado": FLEXORA,
+  "Mesa flexora sentado ou deitado": FLEXORA,
+  "Stiff / RDL": {how:"Quadril para trás, coluna neutra, desça até sentir os posteriores bem alongados. Pare a 1-3 repetições da falha. Descanso de 2-3 min.", why:"Causa bastante dor muscular: evite fazer antes de WODs pesados de deadlift, swing ou corrida."},
+  "Puxada frontal com pegada neutra": {how:"Puxe a barra até o alto do peito e volte até alongar bem as costas. Pare a 1-3 repetições da falha. Descanso de 2-3 min.", why:"Soma com as puxadas e a barra do CrossFit para fechar o volume de costas sem sobrecarregar."},
+  "Remada apoiada no peito": REMADA,
+  "Remada baixa no cabo": REMADA,
+  "Leg press": {how:"Amplitude completa, sem tirar o quadril do banco. Pare a 1-3 repetições da falha. Descanso de 2-3 min.", why:"Volume baixo de quadríceps de propósito: o CrossFit já cobre a maior parte."},
+  "Tríceps na polia (corda)": {how:"Cotovelos colados ao corpo, abra a corda no final. Falha total é segura. Descanso de 60-90 s.", why:"Complementa o tríceps francês; todo o empurrar do CrossFit também soma volume."},
+  "Rosca inclinada com halteres": {how:"No banco inclinado, deixe os braços pendurados para trás e alongue bem o bíceps embaixo. Descanso de 60-90 s.", why:"Volume baixo de bíceps porque as puxadas do CrossFit já cobrem boa parte."},
+  "Nordic (ou glute-ham raise)": {how:"Desça o mais devagar que conseguir, freando com os posteriores. Comece com 1-2 séries. Descanso de 2-3 min.", why:"O Nordic reduz as lesões de posterior em cerca de metade (van Dyk 2019). Gera muita dor muscular: evite antes de WODs pesados de deadlift, swing ou corrida."},
+  "Hip thrust": {how:"Costas apoiadas no banco, suba estendendo o quadril e segure 1 s no topo. Pare a 1-3 repetições da falha. Descanso de 2-3 min.", why:"Volume baixo de glúteo de propósito: o CrossFit cobre o restante."},
+  "Abdominal com rodinha ou prancha": {how:"Na rodinha, avance só até onde consegue manter a lombar neutra. Na prancha, contraia abdômen e glúteos.", why:"Core em volume baixo; o CrossFit já trabalha bastante a estabilidade do tronco."}
+};
+const LS_KEY = "treino-crossfit-v1";
+
+let state = {next:0, session:null, loads:{}, log:[]};
+let pick = null;           // dia escolhido manualmente na tela inicial
+let restEnd = null, restTimer = null;
+let db = null, docRef = null, saveT = null;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function loadLocal(){
+  try{ const r = localStorage.getItem(LS_KEY); if(r) state = Object.assign(state, JSON.parse(r)); }catch(e){}
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+  if(docRef){
+    clearTimeout(saveT);
+    saveT = setTimeout(()=>{ docRef.set(JSON.parse(JSON.stringify(state))).catch(()=>{}); }, 400);
+  }
+}
+
+/* ---------- tela inicial ---------- */
+function renderHome(){
+  const di = pick ?? state.next;
+  const d = DAYS[di];
+  const hist = state.log.slice(-5).reverse();
+  $("#app").innerHTML = `
+    <section class="plate c${di}">
+      <div class="k">${pick===null ? "Próximo treino" : "Treino escolhido"}</div>
+      <h1>${d.nome}</h1>
+      <p>${esc(d.foco)}</p>
+    </section>
+    <ul class="list">
+      ${d.ex.map(e=>`<li><span>${esc(e[0])}</span><span class="sr">${e[1]} × ${e[2]}</span></li>`).join("")}
+    </ul>
+    <button class="primary c${di}" id="start">Começar treino</button>
+
+    <div class="section">
+      <h2>Trocar o dia</h2>
+      <div class="days">
+        ${DAYS.map((x,i)=>`<button class="c${i}" data-day="${i}" aria-pressed="${i===di}"><i class="dot"></i><span>${x.nome}</span></button>`).join("")}
+      </div>
+      <p class="note small muted">A sequência segue sozinha: ao concluir um treino, o app sugere o próximo.</p>
+    </div>
+
+    ${hist.length ? `<div class="section"><h2>Últimos treinos</h2><ul class="hist">
+      ${hist.map(h=>`<li><i class="dot c${h.day}"></i><span>${DAYS[h.day].nome}</span><span class="muted small" style="margin-left:auto">${new Date(h.d).toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"2-digit"})}</span></li>`).join("")}
+    </ul></div>` : ""}
+    <p class="sync small muted" id="sync">Progresso salvo neste iPhone</p>
+  `;
+  $("#start").onclick = ()=>startSession(di);
+  document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{
+    const i = +b.dataset.day; pick = (i===state.next) ? null : i; renderHome();
+  });
+}
+
+function startSession(di){
+  state.session = {day:di, cur:0, sets:DAYS[di].ex.map(()=>0)};
+  pick = null; save(); renderSession();
+}
+
+/* ---------- treino em andamento ---------- */
+function exDone(i){ const s=state.session; return s.sets[i] >= DAYS[s.day].ex[i][1]; }
+function nextOpen(from){
+  const s = state.session, n = DAYS[s.day].ex.length;
+  for(let k=1;k<=n;k++){ const i=(from+k)%n; if(!exDone(i)) return i; }
+  return -1;
+}
+
+function renderSession(){
+  const s = state.session, d = DAYS[s.day], e = d.ex[s.cur];
+  const total = d.ex.reduce((a,x)=>a+x[1],0), feitos = s.sets.reduce((a,x)=>a+x,0);
+  const allDone = d.ex.every((_,i)=>exDone(i));
+  const thisDone = exDone(s.cur);
+  $("#app").innerHTML = `
+    <div class="top">
+      <h2>${d.nome}</h2>
+      <button class="ghost small" id="quit">Sair</button>
+    </div>
+    <div class="bar c${s.day}"><i style="width:${Math.round(feitos/total*100)}%"></i></div>
+
+    <section class="card c${s.day}">
+      <span class="tag">Exercício ${s.cur+1} de ${d.ex.length}</span>
+      <h1>${esc(e[0])}</h1>
+      <div class="target"><b>${e[1]} séries</b> de <b>${e[2]}</b> reps · descanso ${e[3] ? "2-3 min" : "60-90 s"}</div>
+      <div class="load">
+        <label for="kg">Carga</label>
+        <input id="kg" inputmode="decimal" placeholder="kg" value="${esc(state.loads[e[0]]||"")}">
+        <span class="muted small">${state.loads[e[0]] ? "da última vez" : ""}</span>
+      </div>
+      <div class="sets" role="group" aria-label="Séries">
+        ${Array.from({length:e[1]},(_,i)=>`<button class="set ${i<s.sets[s.cur]?"on":""}" data-set="${i}" aria-pressed="${i<s.sets[s.cur]}" aria-label="Série ${i+1}">${i+1}</button>`).join("")}
+      </div>
+      <p class="hint small muted">Toque na série ao terminar.</p>
+      <div id="restbox"></div>
+      ${NOTES[e[0]] ? `<div class="notes">
+        <h3>Como executar</h3><p>${esc(NOTES[e[0]].how)}</p>
+        <h3>Por quê</h3><p>${esc(NOTES[e[0]].why)}</p>
+      </div>` : ""}
+    </section>
+
+    ${allDone
+      ? `<button class="primary c${s.day}" id="finish">Concluir treino</button>`
+      : `<button class="primary c${s.day}" id="adv">${thisDone ? "Próximo exercício" : "Marcar como concluído e seguir"}</button>`}
+
+    <ul class="daylist c${s.day}">
+      ${d.ex.map((x,i)=>`<li><button data-go="${i}">
+        <span class="chk ${exDone(i)?"on":""}">${exDone(i)?"✓":""}</span>
+        <span class="nm ${i===s.cur?"cur":""}">${esc(x[0])}</span>
+        <span class="sr">${s.sets[i]}/${x[1]}</span></button></li>`).join("")}
+    </ul>
+  `;
+  $("#quit").onclick = ()=>{ stopRest(); renderHome(); };
+  $("#kg").onchange = ev=>{ const v=ev.target.value.trim(); if(v) state.loads[e[0]]=v; else delete state.loads[e[0]]; save(); };
+  document.querySelectorAll("[data-set]").forEach(b=>b.onclick=()=>{
+    const i = +b.dataset.set;
+    const was = s.sets[s.cur];
+    s.sets[s.cur] = (i < was) ? i : i+1;
+    save();
+    if(s.sets[s.cur] > was){
+      if(s.sets[s.cur] >= e[1]){
+        stopRest();
+        const n = nextOpen(s.cur);
+        if(n >= 0){ s.cur = n; save(); renderSession(); startRest(e[3]?REST_BASIC:REST_ISO); return; }
+        renderSession(); return;
+      }
+      renderSession(); startRest(e[3]?REST_BASIC:REST_ISO);
+    } else { stopRest(); renderSession(); }
+  });
+  const adv = $("#adv");
+  if(adv) adv.onclick = ()=>{
+    s.sets[s.cur] = e[1];
+    const n = nextOpen(s.cur);
+    if(n >= 0) s.cur = n;
+    save(); stopRest(); renderSession();
+  };
+  const fin = $("#finish");
+  if(fin) fin.onclick = finishSession;
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{ s.cur=+b.dataset.go; save(); renderSession(); });
+  if(restEnd) paintRest();
+}
+
+function finishSession(){
+  const s = state.session;
+  state.log.push({d:new Date().toISOString(), day:s.day});
+  if(state.log.length > 60) state.log = state.log.slice(-60);
+  state.next = (s.day+1) % DAYS.length;
+  state.session = null; stopRest(); save();
+  const d = DAYS[s.day], n = DAYS[state.next];
+  $("#app").innerHTML = `
+    <div class="finish">
+      <div class="ring c${s.day}" style="background:var(--c)"></div>
+      <h1>${d.nome} concluída</h1>
+      <p class="muted">Próximo: <b style="color:var(--ink)">${n.nome}</b> · ${esc(n.foco.toLowerCase())}</p>
+      <button class="primary c${s.day}" id="home">Voltar ao início</button>
+    </div>`;
+  $("#home").onclick = renderHome;
+}
+
+/* ---------- descanso ---------- */
+function startRest(sec){ restEnd = Date.now()+sec*1000; clearInterval(restTimer); restTimer=setInterval(paintRest,250); paintRest(); }
+function stopRest(){ restEnd=null; clearInterval(restTimer); const b=$("#restbox"); if(b) b.innerHTML=""; }
+let buzzed = false;
+function paintRest(){
+  const b = $("#restbox"); if(!b || !restEnd) return;
+  const left = Math.round((restEnd-Date.now())/1000);
+  const over = left <= 0, t = Math.abs(left);
+  const mm = Math.floor(t/60), ss = String(t%60).padStart(2,"0");
+  if(over && !buzzed){ buzzed=true; try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){} }
+  if(!over) buzzed=false;
+  b.innerHTML = `<div class="rest ${over?"over":""}">
+    <div><div class="small">${over?"Descanso cumprido há":"Descanso"}</div><div class="t">${over?"+":""}${mm}:${ss}</div></div>
+    <button id="skip">${over?"Fechar":"Pular"}</button></div>`;
+  $("#skip").onclick = stopRest;
+}
+
+/* ---------- tela sempre acesa durante o treino ---------- */
+let wake = null;
+async function keepAwake(){
+  try{ if(state.session && !wake && navigator.wakeLock){ wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release",()=>{wake=null;}); } }catch(e){}
+}
+function releaseAwake(){ try{ wake && wake.release(); }catch(e){} wake=null; }
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") keepAwake(); });
+const _rs = renderSession; renderSession = function(){ _rs(); keepAwake(); };
+const _rh = renderHome; renderHome = function(){ releaseAwake(); _rh(); };
+
+/* ---------- início ---------- */
+loadLocal();
+state.session ? renderSession() : renderHome();
+
+</script>
+<script>
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
+</script>
+</body>
+</html>
